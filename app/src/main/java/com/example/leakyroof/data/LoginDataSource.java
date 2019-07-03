@@ -1,10 +1,6 @@
 package com.example.leakyroof.data;
 
-import android.content.Intent;
-
-import com.example.leakyroof.GameActivity;
 import com.example.leakyroof.data.model.LoggedInUser;
-import com.example.leakyroof.ui.login.LoginActivity;
 
 import java.io.IOException;
 import java.util.HashMap;

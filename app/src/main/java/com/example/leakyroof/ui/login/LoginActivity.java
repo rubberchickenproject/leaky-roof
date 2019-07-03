@@ -21,8 +21,6 @@ import android.widget.Toast;
 
 import com.example.leakyroof.GameActivity;
 import com.example.leakyroof.R;
-import com.example.leakyroof.ui.login.LoginViewModel;
-import com.example.leakyroof.ui.login.LoginViewModelFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
