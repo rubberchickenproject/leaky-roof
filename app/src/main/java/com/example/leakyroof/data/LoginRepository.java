@@ -2,6 +2,8 @@ package com.example.leakyroof.data;
 
 import com.example.leakyroof.data.model.LoggedInUser;
 
+import java.io.IOException;
+
 /**
  * Class that requests authentication and user information from the remote data source and
  * maintains an in-memory cache of login status and user credentials information.
@@ -43,21 +45,25 @@ public class LoginRepository {
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    public Result<LoggedInUser> login(String username, String password) {
+    public Result<LoggedInUser> login(String username, String password, String pathname) {
         // handle login
-        Result<LoggedInUser> result = dataSource.login(username, password);
+        Result<LoggedInUser> result = dataSource.login(username, password, pathname);
         if (result instanceof Result.Success) {
             setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
         }
         return result;
     }
 
-    public Result<LoggedInUser> register(String username, String password) {
+    public Result<LoggedInUser> register(String username, String password, String pathname) {
         // handle register
-        Result<LoggedInUser> result = dataSource.register(username, password);
+        Result<LoggedInUser> result = dataSource.register(username, password, pathname);
         if (result instanceof Result.Success) {
             setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
         }
         return result;
+    }
+
+    public void writeUserInfo(String pathname) throws IOException {
+        dataSource.writeUserInfo(pathname);
     }
 }

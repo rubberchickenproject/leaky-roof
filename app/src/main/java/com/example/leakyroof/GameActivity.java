@@ -7,7 +7,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageButton;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends MainActivity {
 
     private static float DIM_Y;
     private static float DIM_X;
@@ -16,6 +16,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        LOGIN_FILE_NAME = getFilesDir() + "/roster";
 
         // populate window dimensions
         DisplayMetrics appMetrics = new DisplayMetrics();

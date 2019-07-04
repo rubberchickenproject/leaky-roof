@@ -10,6 +10,8 @@ import com.example.leakyroof.data.Result;
 import com.example.leakyroof.data.model.LoggedInUser;
 import com.example.leakyroof.R;
 
+import java.io.IOException;
+
 public class LoginViewModel extends ViewModel {
 
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
@@ -28,9 +30,9 @@ public class LoginViewModel extends ViewModel {
         return loginResult;
     }
 
-    public void login(String username, String password) {
+    public void login(String username, String password, String pathname) {
         // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(username, password);
+        Result<LoggedInUser> result = loginRepository.login(username, password, pathname);
 
         if (result instanceof Result.LoginSuccess) {
             LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
@@ -40,9 +42,9 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
-    public void register(String username, String password) {
+    public void register(String username, String password, String pathname) {
         // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.register(username, password);
+        Result<LoggedInUser> result = loginRepository.register(username, password, pathname);
 
         if (result instanceof Result.RegisterSuccess) {
             LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
@@ -60,6 +62,10 @@ public class LoginViewModel extends ViewModel {
         } else {
             loginFormState.setValue(new LoginFormState(true));
         }
+    }
+
+    public void writeUserInfo(String pathname) throws IOException {
+        loginRepository.writeUserInfo(pathname);
     }
 
     // A placeholder username validation check
