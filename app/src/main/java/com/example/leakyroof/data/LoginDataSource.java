@@ -50,8 +50,6 @@ public class LoginDataSource {
         }
     }
 
-    public void logout() {}
-
     public Result<LoggedInUser> register(String username, String password, String pathname) {
 
         try {
