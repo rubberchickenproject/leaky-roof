@@ -19,6 +19,7 @@ public class LoginDataSource {
     private Map<String, String> roster = null;
 
     private void initializeIfNeeded(String pathname) {
+        // TODO: encrypt this!
         if (roster == null) {
             roster = new HashMap<>();
             try {
@@ -69,11 +70,17 @@ public class LoginDataSource {
     }
 
     public void writeUserInfo(String pathname) throws IOException {
+        // TODO: make sure this is replacing the file's content each time
         initializeIfNeeded(pathname);
         FileOutputStream fileOutputStream = new FileOutputStream(pathname);
         ObjectOutputStream outputStream =
                 new ObjectOutputStream(fileOutputStream);
         outputStream.writeObject(roster);
         outputStream.close();
+    }
+
+    public void clearLoginInfo(String pathname) throws IOException {
+        roster = new HashMap<>();
+        writeUserInfo(pathname);
     }
 }

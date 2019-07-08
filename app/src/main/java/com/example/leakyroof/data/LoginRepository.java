@@ -61,4 +61,8 @@ public class LoginRepository {
     public void writeUserInfo(String pathname) throws IOException {
         dataSource.writeUserInfo(pathname);
     }
+
+    public void clearLoginInfo(String pathname) throws IOException {
+        dataSource.clearLoginInfo(pathname);
+    }
 }

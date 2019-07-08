@@ -2,20 +2,22 @@ package com.example.leakyroof.ui.login;
 
 import android.support.annotation.Nullable;
 
+import java.util.Objects;
+
 /**
  * Authentication result : success (user details) or error message.
  */
-class LoginResult {
+public class LoginResult {
     @Nullable
     private LoggedInUserView success;
     @Nullable
     private Integer error;
 
-    LoginResult(@Nullable Integer error) {
+    public LoginResult(@Nullable Integer error) {
         this.error = error;
     }
 
-    LoginResult(@Nullable LoggedInUserView success) {
+    public LoginResult(@Nullable LoggedInUserView success) {
         this.success = success;
     }
 
@@ -27,5 +29,14 @@ class LoginResult {
     @Nullable
     Integer getError() {
         return error;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof LoginResult))
+            return false;
+        LoginResult castObject = (LoginResult) obj;
+        return Objects.equals(castObject.getError(), getError()) &&
+                Objects.equals(castObject.getSuccess(), getSuccess());
     }
 }

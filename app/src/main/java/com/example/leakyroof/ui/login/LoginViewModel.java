@@ -22,11 +22,11 @@ public class LoginViewModel extends ViewModel {
         this.loginRepository = loginRepository;
     }
 
-    LiveData<LoginFormState> getLoginFormState() {
+    public LiveData<LoginFormState> getLoginFormState() {
         return loginFormState;
     }
 
-    LiveData<LoginResult> getLoginResult() {
+    public LiveData<LoginResult> getLoginResult() {
         return loginResult;
     }
 
@@ -66,6 +66,10 @@ public class LoginViewModel extends ViewModel {
 
     public void writeUserInfo(String pathname) throws IOException {
         loginRepository.writeUserInfo(pathname);
+    }
+
+    public void clearLoginInfo(String pathname) throws IOException {
+        loginRepository.clearLoginInfo(pathname);
     }
 
     // A placeholder username validation check
