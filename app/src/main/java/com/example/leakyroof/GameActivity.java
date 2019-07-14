@@ -1,5 +1,6 @@
 package com.example.leakyroof;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,13 +15,15 @@ import com.example.leakyroof.ui.login.LoginActivity;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.view.View.VISIBLE;
+
 public class GameActivity extends MainActivity {
 
     private static float DIM_Y;
     private static float DIM_X;
     private int LEVEL = 2;
     private static final int MAX_RAINDROP_DIAMETER = 200;
-    private Map<View, ObjectAnimator> raindropsToAnimators = new HashMap<>();
+    private Map<ImageButton, ObjectAnimator> raindropsToAnimators = new HashMap<>();
     private static final float RAINDROP_SPEED = 1; // keep less than 2
 
     @Override
@@ -54,13 +57,31 @@ public class GameActivity extends MainActivity {
                     raindropButton, "translationY",
                     DIM_Y - raindropButton.getTranslationY());
             raindropAnimator.addListener(new RaindropAnimationListener(scoreTextView));
+            final ImageButton finalRaindropButton = raindropButton;
+            raindropAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    finalRaindropButton.setVisibility(VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {}
+
+                @Override
+                public void onAnimationCancel(Animator animation) {}
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {}
+            });
             raindropsToAnimators.put(raindropButton, raindropAnimator);
             layout.addView(raindropButton);
         }
 
         // main loop
-        for (ObjectAnimator animator : raindropsToAnimators.values()) {
-            moveRaindrop(animator);
+        int startDelay = 0;
+        for (ImageButton raindrop : raindropsToAnimators.keySet()) {
+            moveRaindrop(raindropsToAnimators.get(raindrop), startDelay);
+            startDelay += 1000;
         }
     }
 
@@ -73,12 +94,14 @@ public class GameActivity extends MainActivity {
         raindropButton.setMaxWidth(MAX_RAINDROP_DIAMETER);
         raindropButton.setTranslationX(xTranslation); // space evenly
         raindropButton.setTranslationY(layout.getTop());
+        raindropButton.setVisibility(View.GONE);
         return raindropButton;
     }
 
-    private void moveRaindrop(ObjectAnimator animator) {
-        /** whatever else I can manage to get working */
+    private void moveRaindrop(ObjectAnimator animator, int startDelay) {
+        /** Animate the falling raindrop */
         long duration = (long) (10 * DIM_Y / RAINDROP_SPEED);
+        animator.setStartDelay(startDelay);
         animator.setDuration(duration);
         animator.start();
     }
