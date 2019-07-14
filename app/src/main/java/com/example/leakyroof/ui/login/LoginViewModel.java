@@ -66,11 +66,11 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
-    public void writeUserInfo(String pathname) throws IOException {
+    public void writeUserInfo(String pathname) throws Exception {
         loginRepository.writeUserInfo(pathname);
     }
 
-    public void clearLoginInfo(String pathname) throws IOException {
+    public void clearLoginInfo(String pathname) throws Exception {
         loginRepository.clearLoginInfo(pathname);
     }
 

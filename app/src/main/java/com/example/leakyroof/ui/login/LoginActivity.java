@@ -20,6 +20,9 @@ import android.widget.Toast;
 import com.example.leakyroof.GameActivity;
 import com.example.leakyroof.MainActivity;
 import com.example.leakyroof.R;
+import com.example.leakyroof.data.LoginDataSource;
+
+import java.io.IOException;
 
 public class LoginActivity extends MainActivity {
 
@@ -133,6 +136,16 @@ public class LoginActivity extends MainActivity {
                         LOGIN_FILE_NAME);
             }
         });
+    }
+
+    // Uncomment to add backdoor
+    public void backdoor(View view) throws Exception {
+        LoginDataSource temp = new LoginDataSource();
+        try {
+            temp.clearLoginInfo(LOGIN_FILE_NAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateUiWithUser(LoggedInUserView model) {

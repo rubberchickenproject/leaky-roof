@@ -62,11 +62,11 @@ public class LoginRepository {
         return result;
     }
 
-    public void writeUserInfo(String pathname) throws IOException {
+    public void writeUserInfo(String pathname) throws Exception {
         dataSource.writeUserInfo(pathname);
     }
 
-    public void clearLoginInfo(String pathname) throws IOException {
+    public void clearLoginInfo(String pathname) throws Exception {
         dataSource.clearLoginInfo(pathname);
     }
 }

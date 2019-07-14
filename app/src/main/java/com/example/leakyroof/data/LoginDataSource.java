@@ -18,7 +18,7 @@ public class LoginDataSource {
 
     private Map<String, LoggedInUser> roster = null;
 
-    private void initializeIfNeeded(String pathname) {
+    private Exception initializeIfNeeded(String pathname) {
         // TODO: encrypt this!
         if (roster == null) {
             roster = new HashMap<>();
@@ -28,17 +28,22 @@ public class LoginDataSource {
                 ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(f));
                 roster = (Map) inputStream.readObject();
                 inputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                return new IOException("Could not find roster file");
+            } catch (ClassNotFoundException e) {
+                return new ClassNotFoundException("File needs purging");
             }
         }
+        return null;
     }
 
     public Result<LoggedInUser> login(
             String username, String password, String displayName, String pathname) {
 
         try {
-            initializeIfNeeded(pathname);
+            Exception initializeResult = initializeIfNeeded(pathname);
+            if (!(initializeResult == null))
+                return new Result.Error(initializeResult);
             if (!roster.containsKey(username) ||
                     !roster.get(username).getPassword().equals(password))
                 return new Result.Error(new IOException("Incorrect username or password"));
@@ -54,7 +59,9 @@ public class LoginDataSource {
             String username, String password, String displayName, String pathname) {
 
         try {
-            initializeIfNeeded(pathname);
+            Exception initializeResult = initializeIfNeeded(pathname);
+            if (!(initializeResult == null))
+                return new Result.Error(initializeResult);
             // TODO: check that user and pass have the correct form
             if (roster.containsKey(username))
                 return new Result.Error(new IOException("User already exists"));
@@ -66,9 +73,11 @@ public class LoginDataSource {
         }
     }
 
-    public void writeUserInfo(String pathname) throws IOException {
+    public void writeUserInfo(String pathname) throws Exception {
         // TODO: make sure this is replacing the file's content each time
-        initializeIfNeeded(pathname);
+        Exception initializeResult = initializeIfNeeded(pathname);
+        if (!(initializeResult == null))
+            throw initializeResult;
         FileOutputStream fileOutputStream = new FileOutputStream(pathname);
         ObjectOutputStream outputStream =
                 new ObjectOutputStream(fileOutputStream);
@@ -76,12 +85,14 @@ public class LoginDataSource {
         outputStream.close();
     }
 
-    public void clearLoginInfo(String pathname) throws IOException {
+    public void clearLoginInfo(String pathname) throws Exception {
         /** Resets all local and external records of user info, tread lightly
          *
          * Should only be callable from admin or programmatically
          */
-        initializeIfNeeded(pathname);
+        Exception initializeResult = initializeIfNeeded(pathname);
+        if (!(initializeResult == null))
+            throw initializeResult;
         roster = new HashMap<>();
         writeUserInfo(pathname);
     }

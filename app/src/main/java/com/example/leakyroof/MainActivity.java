@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         try {
             loginViewModel.writeUserInfo(LOGIN_FILE_NAME);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         super.onPause();
