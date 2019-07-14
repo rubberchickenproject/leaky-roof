@@ -21,8 +21,6 @@ import com.example.leakyroof.GameActivity;
 import com.example.leakyroof.MainActivity;
 import com.example.leakyroof.R;
 
-import java.io.IOException;
-
 public class LoginActivity extends MainActivity {
 
     @Override
@@ -33,6 +31,7 @@ public class LoginActivity extends MainActivity {
 
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
+        final EditText displayNameEditText = findViewById(R.id.displayname);
         final Button signInButton = findViewById(R.id.signin);
         final Button registerButton = findViewById(R.id.register);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
@@ -87,19 +86,25 @@ public class LoginActivity extends MainActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
+                loginViewModel.loginDataChanged(
+                        usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        displayNameEditText.getText().toString());
             }
         };
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
+        displayNameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
-                            passwordEditText.getText().toString(), LOGIN_FILE_NAME);
+                    loginViewModel.login(
+                            usernameEditText.getText().toString(),
+                            passwordEditText.getText().toString(),
+                            displayNameEditText.getText().toString(),
+                            LOGIN_FILE_NAME);
                 }
                 return false;
             }
@@ -109,8 +114,11 @@ public class LoginActivity extends MainActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString(), LOGIN_FILE_NAME);
+                loginViewModel.login(
+                        usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        displayNameEditText.getText().toString(),
+                        LOGIN_FILE_NAME);
             }
         });
 
@@ -118,8 +126,11 @@ public class LoginActivity extends MainActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                loginViewModel.register(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString(), LOGIN_FILE_NAME);
+                loginViewModel.register(
+                        usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        displayNameEditText.getText().toString(),
+                        LOGIN_FILE_NAME);
             }
         });
     }
@@ -137,7 +148,10 @@ public class LoginActivity extends MainActivity {
         // reset
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
+        final EditText displayNameEditText = findViewById(R.id.displayname);
         usernameEditText.setText("");
         passwordEditText.setText("");
+        displayNameEditText.setText("");
+
     }
 }

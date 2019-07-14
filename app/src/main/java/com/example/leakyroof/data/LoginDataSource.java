@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class LoginDataSource {
 
-    private Map<String, String> roster = null;
+    private Map<String, LoggedInUser> roster = null;
 
     private void initializeIfNeeded(String pathname) {
         // TODO: encrypt this!
@@ -31,39 +31,36 @@ public class LoginDataSource {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 
-    public Result<LoggedInUser> login(String username, String password, String pathname) {
+    public Result<LoggedInUser> login(
+            String username, String password, String displayName, String pathname) {
 
         try {
             initializeIfNeeded(pathname);
-            if (!roster.containsKey(username) || !roster.get(username).equals(password))
+            if (!roster.containsKey(username) ||
+                    !roster.get(username).getPassword().equals(password))
                 return new Result.Error(new IOException("Incorrect username or password"));
-            LoggedInUser returnUser =
-                    new LoggedInUser(
-                            java.util.UUID.randomUUID().toString(),
-                            username);
-            return new Result.LoginSuccess<>(returnUser);
+            roster.put(username,
+                    new LoggedInUser(username, displayName, password));
+            return new Result.LoginSuccess<>(roster.get(username));
         } catch (Exception e) {
             return new Result.Error(new IOException("Error logging in", e));
         }
     }
 
-    public Result<LoggedInUser> register(String username, String password, String pathname) {
+    public Result<LoggedInUser> register(
+            String username, String password, String displayName, String pathname) {
 
         try {
             initializeIfNeeded(pathname);
             // TODO: check that user and pass have the correct form
             if (roster.containsKey(username))
                 return new Result.Error(new IOException("User already exists"));
-            roster.put(username, password);
-            LoggedInUser newUser =
-                    new LoggedInUser(
-                            java.util.UUID.randomUUID().toString(),
-                            username);
-            return new Result.RegisterSuccess<>(newUser);
+            roster.put(username,
+                    new LoggedInUser(username, displayName, password));
+            return new Result.RegisterSuccess<>(roster.get(username));
         } catch (Exception e) {
             return new Result.Error(new IOException("Error registering", e));
         }
@@ -80,6 +77,11 @@ public class LoginDataSource {
     }
 
     public void clearLoginInfo(String pathname) throws IOException {
+        /** Resets all local and external records of user info, tread lightly
+         *
+         * Should only be callable from admin or programmatically
+         */
+        initializeIfNeeded(pathname);
         roster = new HashMap<>();
         writeUserInfo(pathname);
     }

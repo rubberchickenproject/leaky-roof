@@ -40,18 +40,22 @@ public class LoginRepository {
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    public Result<LoggedInUser> login(String username, String password, String pathname) {
+    public Result<LoggedInUser> login(
+            String username, String password, String displayName, String pathname) {
         // handle login
-        Result<LoggedInUser> result = dataSource.login(username, password, pathname);
+        Result<LoggedInUser> result = dataSource.login(
+                username, password, displayName, pathname);
         if (result instanceof Result.Success) {
             setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
         }
         return result;
     }
 
-    public Result<LoggedInUser> register(String username, String password, String pathname) {
+    public Result<LoggedInUser> register(
+            String username, String password, String displayName, String pathname) {
         // handle register
-        Result<LoggedInUser> result = dataSource.register(username, password, pathname);
+        Result<LoggedInUser> result = dataSource.register(
+                username, password, displayName, pathname);
         if (result instanceof Result.Success) {
             setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
         }

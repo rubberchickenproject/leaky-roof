@@ -1,9 +1,6 @@
 package com.example.leakyroof;
 
-import android.app.Activity;
-import android.app.Application;
 import android.arch.lifecycle.ViewModelProviders;
-import android.support.v4.app.FragmentActivity;
 
 import com.example.leakyroof.ui.login.LoggedInUserView;
 import com.example.leakyroof.ui.login.LoginActivity;
@@ -11,7 +8,6 @@ import com.example.leakyroof.ui.login.LoginFormState;
 import com.example.leakyroof.ui.login.LoginResult;
 import com.example.leakyroof.ui.login.LoginViewModel;
 import com.example.leakyroof.ui.login.LoginViewModelFactory;
-import androidx.test.internal.platform.app.ActivityInvoker;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,6 +37,8 @@ public class LoginActivityUnitTest {
     private String VALID_PASSWORD;
     private String WRONG_PASSWORD;
     private String INVALID_PASSWORD_SHORT;
+    private String DISPLAY_NAME;
+    private String NEW_DISPLAY_NAME;
     private String PATH_NAME;
 
     @Before
@@ -57,6 +55,9 @@ public class LoginActivityUnitTest {
         WRONG_PASSWORD = "wrong_password";
         INVALID_PASSWORD_SHORT = "pass";
 
+        DISPLAY_NAME = "Ben Bitdiddle";
+        NEW_DISPLAY_NAME = "Alice P. Hacker";
+
         PATH_NAME = "test_roster";
     }
 
@@ -71,7 +72,7 @@ public class LoginActivityUnitTest {
 
     @Test
     public void dataChanged_valid() {
-        LOGIN_VIEW_MODEL.loginDataChanged(VALID_USERNAME, VALID_PASSWORD);
+        LOGIN_VIEW_MODEL.loginDataChanged(VALID_USERNAME, VALID_PASSWORD, DISPLAY_NAME);
         LoginFormState actualResult = LOGIN_VIEW_MODEL.getLoginFormState().getValue();
         LoginFormState expectedResult = new LoginFormState(true);
         assertEquals(expectedResult, actualResult);
@@ -79,7 +80,7 @@ public class LoginActivityUnitTest {
 
     @Test
     public void dataChanged_email_invalid_no_at() {
-        LOGIN_VIEW_MODEL.loginDataChanged(INVALID_USERNAME_EMPTY, VALID_PASSWORD);
+        LOGIN_VIEW_MODEL.loginDataChanged(INVALID_USERNAME_EMPTY, VALID_PASSWORD, DISPLAY_NAME);
         LoginFormState actualResult = LOGIN_VIEW_MODEL.getLoginFormState().getValue();
         LoginFormState expectedResult = new LoginFormState(R.string.invalid_username, null);
         assertEquals(expectedResult, actualResult);
@@ -87,7 +88,7 @@ public class LoginActivityUnitTest {
 
     @Test
     public void dataChanged_email_invalid_no_domain() {
-        LOGIN_VIEW_MODEL.loginDataChanged(INVALID_USERNAME_NO_DOMAIN, VALID_PASSWORD);
+        LOGIN_VIEW_MODEL.loginDataChanged(INVALID_USERNAME_NO_DOMAIN, VALID_PASSWORD, DISPLAY_NAME);
         LoginFormState actualResult = LOGIN_VIEW_MODEL.getLoginFormState().getValue();
         LoginFormState expectedResult = new LoginFormState(R.string.invalid_username, null);
         assertEquals(expectedResult, actualResult);
@@ -95,7 +96,7 @@ public class LoginActivityUnitTest {
 
     @Test
     public void dataChanged_password_invalid() {
-        LOGIN_VIEW_MODEL.loginDataChanged(VALID_USERNAME, INVALID_PASSWORD_SHORT);
+        LOGIN_VIEW_MODEL.loginDataChanged(VALID_USERNAME, INVALID_PASSWORD_SHORT, DISPLAY_NAME);
         LoginFormState actualResult = LOGIN_VIEW_MODEL.getLoginFormState().getValue();
         LoginFormState expectedResult = new LoginFormState(null, R.string.invalid_password);
         assertEquals(expectedResult, actualResult);
@@ -103,17 +104,17 @@ public class LoginActivityUnitTest {
 
     @Test
     public void registration_successful() {
-        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, PATH_NAME);
+        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, DISPLAY_NAME, PATH_NAME);
         LoginResult actualResult = LOGIN_VIEW_MODEL.getLoginResult().getValue();
-        LoginResult expectedResult = new LoginResult(new LoggedInUserView(VALID_USERNAME));
+        LoginResult expectedResult = new LoginResult(new LoggedInUserView(DISPLAY_NAME));
         assertEquals(expectedResult, actualResult);
     }
 
     @Test
     public void registration_username_taken() {
-        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, PATH_NAME);
+        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, DISPLAY_NAME, PATH_NAME);
 
-        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, PATH_NAME);
+        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, DISPLAY_NAME, PATH_NAME);
         LoginResult actualResult = LOGIN_VIEW_MODEL.getLoginResult().getValue();
         LoginResult expectedResult = new LoginResult(R.string.register_failed);
         assertEquals(expectedResult, actualResult);
@@ -121,19 +122,29 @@ public class LoginActivityUnitTest {
 
     @Test
     public void login_successful() {
-        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, PATH_NAME);
+        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, DISPLAY_NAME, PATH_NAME);
 
-        LOGIN_VIEW_MODEL.login(VALID_USERNAME, VALID_PASSWORD, PATH_NAME);
+        LOGIN_VIEW_MODEL.login(VALID_USERNAME, VALID_PASSWORD, DISPLAY_NAME, PATH_NAME);
         LoginResult actualResult = LOGIN_VIEW_MODEL.getLoginResult().getValue();
-        LoginResult expectedResult = new LoginResult(new LoggedInUserView(VALID_USERNAME));
+        LoginResult expectedResult = new LoginResult(new LoggedInUserView(DISPLAY_NAME));
+        assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
+    public void login_successful_display_name_change() {
+        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, DISPLAY_NAME, PATH_NAME);
+
+        LOGIN_VIEW_MODEL.login(VALID_USERNAME, VALID_PASSWORD, NEW_DISPLAY_NAME, PATH_NAME);
+        LoginResult actualResult = LOGIN_VIEW_MODEL.getLoginResult().getValue();
+        LoginResult expectedResult = new LoginResult(new LoggedInUserView(NEW_DISPLAY_NAME));
         assertEquals(expectedResult, actualResult);
     }
 
     @Test
     public void login_wrong_password() {
-        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, PATH_NAME);
+        LOGIN_VIEW_MODEL.register(VALID_USERNAME, VALID_PASSWORD, DISPLAY_NAME, PATH_NAME);
 
-        LOGIN_VIEW_MODEL.login(VALID_USERNAME, WRONG_PASSWORD, PATH_NAME);
+        LOGIN_VIEW_MODEL.login(VALID_USERNAME, WRONG_PASSWORD, DISPLAY_NAME, PATH_NAME);
         LoginResult actualResult = LOGIN_VIEW_MODEL.getLoginResult().getValue();
         LoginResult expectedResult = new LoginResult(R.string.login_failed);
         assertEquals(expectedResult, actualResult);
@@ -141,7 +152,7 @@ public class LoginActivityUnitTest {
 
     @Test
     public void login_user_nonexistent() {
-        LOGIN_VIEW_MODEL.login(WRONG_USERNAME, WRONG_PASSWORD, PATH_NAME);
+        LOGIN_VIEW_MODEL.login(WRONG_USERNAME, WRONG_PASSWORD, DISPLAY_NAME, PATH_NAME);
         LoginResult actualResult = LOGIN_VIEW_MODEL.getLoginResult().getValue();
         LoginResult expectedResult = new LoginResult(R.string.login_failed);
         assertEquals(expectedResult, actualResult);

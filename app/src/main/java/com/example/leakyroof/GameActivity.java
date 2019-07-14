@@ -21,7 +21,7 @@ public class GameActivity extends MainActivity {
     private int LEVEL = 2;
     private static final int MAX_RAINDROP_DIAMETER = 200;
     private Map<View, ObjectAnimator> raindropsToAnimators = new HashMap<>();
-    private static final float RAINDROP_SPEED = 1; // TODO: come up with reasonable range here
+    private static final float RAINDROP_SPEED = 1; // keep less than 2
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class GameActivity extends MainActivity {
         setContentView(R.layout.activity_game);
         LOGIN_FILE_NAME = getFilesDir() + "/roster";
 
-        // populate window dimensions
+        // get window dimensions
         DisplayMetrics appMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(appMetrics);
         DIM_Y = appMetrics.heightPixels;
@@ -48,16 +48,11 @@ public class GameActivity extends MainActivity {
         };
 
         for (int i = 0; i < LEVEL; i++) {
-            raindropButton = new ImageButton(this);
-            raindropButton.setImageDrawable(getDrawable(R.drawable.raindrop));
-            raindropButton.setAdjustViewBounds(true);
-            raindropButton.setMaxHeight(MAX_RAINDROP_DIAMETER);
-            raindropButton.setMaxWidth(MAX_RAINDROP_DIAMETER);
-            raindropButton.setTranslationX(DIM_X * i / LEVEL); // space evenly
-            raindropButton.setTranslationY(layout.getTop());
+            raindropButton = createRaindrop(layout, DIM_X * i / LEVEL);
             raindropButton.setOnClickListener(raindropListener);
             raindropAnimator = ObjectAnimator.ofFloat(
-                    raindropButton, "translationY", DIM_Y - raindropButton.getTranslationY());
+                    raindropButton, "translationY",
+                    DIM_Y - raindropButton.getTranslationY());
             raindropAnimator.addListener(new RaindropAnimationListener(scoreTextView));
             raindropsToAnimators.put(raindropButton, raindropAnimator);
             layout.addView(raindropButton);
@@ -69,17 +64,29 @@ public class GameActivity extends MainActivity {
         }
     }
 
+    private ImageButton createRaindrop(ConstraintLayout layout, float xTranslation) {
+        /** Returns a new stationary raindrop button, not yet added to layout */
+        ImageButton raindropButton = new ImageButton(this);
+        raindropButton.setImageDrawable(getDrawable(R.drawable.raindrop));
+        raindropButton.setAdjustViewBounds(true);
+        raindropButton.setMaxHeight(MAX_RAINDROP_DIAMETER);
+        raindropButton.setMaxWidth(MAX_RAINDROP_DIAMETER);
+        raindropButton.setTranslationX(xTranslation); // space evenly
+        raindropButton.setTranslationY(layout.getTop());
+        return raindropButton;
+    }
+
     private void moveRaindrop(ObjectAnimator animator) {
-        /** Executes actual animation using animator/whatever else I can manage to get working */
+        /** whatever else I can manage to get working */
         long duration = (long) (10 * DIM_Y / RAINDROP_SPEED);
         animator.setDuration(duration);
         animator.start();
     }
 
-    /** Layout level methods (must be public)... **/
+    /** Layout level methods (must be public)... */
 
     public void catchRaindrop(View view, ObjectAnimator animator) {
-        /* TODO: extend animator for multiple raindrops */
+        /** TODO: extend animator for multiple raindrops */
         animator.cancel();
         view.setVisibility(View.GONE);
     }
