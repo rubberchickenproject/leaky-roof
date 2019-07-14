@@ -3,6 +3,7 @@ package com.example.leakyroof;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageButton;
@@ -10,12 +11,17 @@ import android.widget.TextView;
 
 import com.example.leakyroof.ui.login.LoginActivity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameActivity extends MainActivity {
 
     private static float DIM_Y;
     private static float DIM_X;
-    private ObjectAnimator raindropAnimator;
-    private static final int RAINDROP_SPEED = 40; // TODO: come up with reasonable range here
+    private int LEVEL = 2;
+    private static final int MAX_RAINDROP_DIAMETER = 200;
+    private Map<View, ObjectAnimator> raindropsToAnimators = new HashMap<>();
+    private static final float RAINDROP_SPEED = 1; // TODO: come up with reasonable range here
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,30 +35,52 @@ public class GameActivity extends MainActivity {
         DIM_Y = appMetrics.heightPixels;
         DIM_X = appMetrics.widthPixels;
 
-        ImageButton raindropButton = findViewById(R.id.raindrop);
+        ConstraintLayout layout = findViewById(R.id.gameLayout);
+
+        ImageButton raindropButton;
+        ObjectAnimator raindropAnimator;
         TextView scoreTextView = findViewById(R.id.scoreTextView);
-        raindropAnimator = ObjectAnimator.ofFloat(
-                raindropButton, "translationY", DIM_Y - raindropButton.getTranslationY());
+        View.OnClickListener raindropListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                catchRaindrop(v, raindropsToAnimators.get(v));
+            }
+        };
 
+        for (int i = 0; i < LEVEL; i++) {
+            raindropButton = new ImageButton(this);
+            raindropButton.setImageDrawable(getDrawable(R.drawable.raindrop));
+            raindropButton.setAdjustViewBounds(true);
+            raindropButton.setMaxHeight(MAX_RAINDROP_DIAMETER);
+            raindropButton.setMaxWidth(MAX_RAINDROP_DIAMETER);
+            raindropButton.setTranslationX(DIM_X * i / LEVEL); // space evenly
+            raindropButton.setTranslationY(layout.getTop());
+            raindropButton.setOnClickListener(raindropListener);
+            raindropAnimator = ObjectAnimator.ofFloat(
+                    raindropButton, "translationY", DIM_Y - raindropButton.getTranslationY());
+            raindropAnimator.addListener(new RaindropAnimationListener(scoreTextView));
+            raindropsToAnimators.put(raindropButton, raindropAnimator);
+            layout.addView(raindropButton);
+        }
 
-        RaindropAnimationListener raindropAnimationListener =
-                new RaindropAnimationListener(scoreTextView);
-        raindropAnimator.addListener(raindropAnimationListener);
-
-        moveRaindrop();
+        // main loop
+        for (ObjectAnimator animator : raindropsToAnimators.values()) {
+            moveRaindrop(animator);
+        }
     }
 
-    private void moveRaindrop() {
+    private void moveRaindrop(ObjectAnimator animator) {
         /** Executes actual animation using animator/whatever else I can manage to get working */
-        raindropAnimator.setDuration(5000);
-        raindropAnimator.start();
+        long duration = (long) (10 * DIM_Y / RAINDROP_SPEED);
+        animator.setDuration(duration);
+        animator.start();
     }
 
     /** Layout level methods (must be public)... **/
 
-    public void catchRaindrop(View view) {
+    public void catchRaindrop(View view, ObjectAnimator animator) {
         /* TODO: extend animator for multiple raindrops */
-        raindropAnimator.cancel();
+        animator.cancel();
         view.setVisibility(View.GONE);
     }
 
