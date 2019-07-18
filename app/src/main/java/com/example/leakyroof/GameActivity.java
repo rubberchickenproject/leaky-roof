@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -16,16 +17,17 @@ import com.example.leakyroof.ui.login.LoginActivity;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.view.View.VISIBLE;
-
 public class GameActivity extends MainActivity {
+
+    private int LEVEL = 5; // TODO: make this adjustable
+    private static final int MAX_RAINDROP_DIAMETER = 100;
+    private static final float RAINDROP_AVG_SPEED = 2.0f; // 1.0f for testing, 2.0f for users
+    private static final int MAX_DELAY = 1000;
+    private static final float ACCELERATION_COEFF = 2.0f;
 
     private static float DIM_Y;
     private static float DIM_X;
-    private int LEVEL = 3; // TODO: make this adjustable
-    private static final int MAX_RAINDROP_DIAMETER = 100;
     private Map<ImageButton, ObjectAnimator> raindropsToAnimators = new HashMap<>();
-    private static final float RAINDROP_SPEED = 1; // keep less than 2
     private static ConstraintLayout LAYOUT;
 
     @Override
@@ -48,17 +50,18 @@ public class GameActivity extends MainActivity {
         View.OnClickListener raindropListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                catchRaindrop(v, raindropsToAnimators.get(v));
+                catchRaindrop(raindropsToAnimators.get(v));
             }
         };
 
         for (int i = 0; i < LEVEL; i++) {
-            // TODO: recycle raindrops
-            raindropButton = createRaindrop(LAYOUT, DIM_X * i / LEVEL);
+            raindropButton = createRaindrop(LAYOUT, (int) (Math.random() * DIM_X));
             raindropButton.setOnClickListener(raindropListener);
             raindropAnimator = ObjectAnimator.ofFloat(
                     raindropButton, "translationY",
                     DIM_Y - raindropButton.getTranslationY());
+            raindropAnimator.setInterpolator(
+                    new AccelerateInterpolator(ACCELERATION_COEFF / 2));
             raindropAnimator.setRepeatCount(ValueAnimator.INFINITE);
             raindropAnimator.addListener(new RaindropAnimationListener(scoreTextView));
             final ImageButton finalRaindropButton = raindropButton;
@@ -85,9 +88,11 @@ public class GameActivity extends MainActivity {
 
         // main loop
         int startDelay = 0;
+        int randomDelay;
         for (ImageButton raindrop : raindropsToAnimators.keySet()) {
             moveRaindrop(raindropsToAnimators.get(raindrop), startDelay);
-            startDelay += 1000; // TODO: vary this
+            randomDelay = (int) (Math.random() * MAX_DELAY);
+            startDelay += randomDelay;
         }
     }
 
@@ -105,8 +110,8 @@ public class GameActivity extends MainActivity {
     }
 
     private void moveRaindrop(ObjectAnimator animator, int startDelay) {
-        /** Animate the falling raindrop */
-        long duration = (long) (10 * DIM_Y / RAINDROP_SPEED);
+        /** Initiate a falling raindrop */
+        long duration = (long) (10 * DIM_Y / RAINDROP_AVG_SPEED);
         animator.setStartDelay(startDelay);
         animator.setDuration(duration);
         animator.start();
@@ -114,10 +119,11 @@ public class GameActivity extends MainActivity {
 
     /** Layout level methods (must be public)... */
 
-    public void catchRaindrop(View view, ObjectAnimator animator) {
+    public void catchRaindrop(ObjectAnimator animator) {
         animator.end();
-        createRaindrop(LAYOUT, ((ImageButton) animator.getTarget()).getTranslationX());
-        animator.setStartDelay(1000); // TODO: make this random
+        createRaindrop(LAYOUT, (int) (Math.random() * DIM_X));
+        int randomDelay = (int) (Math.random() * MAX_DELAY);
+        animator.setStartDelay(randomDelay);
         animator.start();
     }
 
