@@ -1,8 +1,10 @@
 package com.example.leakyroof.ui.login;
 
+import android.animation.StateListAnimator;
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -38,6 +40,13 @@ public class LoginActivity extends MainActivity {
         final Button signInButton = findViewById(R.id.signin);
         final Button registerButton = findViewById(R.id.register);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
+
+        // make hints color match rest of text
+        // TODO: figure out how to do this in xml
+        usernameEditText.setHintTextColor(getResources().getColor(R.color.colorText));
+        passwordEditText.setHintTextColor(getResources().getColor(R.color.colorText));
+        displayNameEditText.setHintTextColor(getResources().getColor(R.color.colorText));
+
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override

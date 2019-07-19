@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.util.DisplayMetrics;
@@ -57,6 +58,7 @@ public class GameActivity extends MainActivity {
         for (int i = 0; i < LEVEL; i++) {
             raindropButton = createRaindrop(LAYOUT, (int) (Math.random() * DIM_X));
             raindropButton.setOnClickListener(raindropListener);
+            raindropButton.setBackgroundColor(Color.TRANSPARENT);
             raindropAnimator = ObjectAnimator.ofFloat(
                     raindropButton, "translationY",
                     DIM_Y - raindropButton.getTranslationY());
