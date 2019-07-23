@@ -9,7 +9,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
+        <activity
+            android:name=".data.LevelActivity"
+            android:label="@string/title_activity_level"
+            android:parentActivityName=".ui.login.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.leakyroof.ui.login.LoginActivity" />
+        </activity>
+        <activity android:name=".MainActivity" />
         <activity android:name=".GameActivity" />
         <activity
             android:name=".ui.login.LoginActivity"

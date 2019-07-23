@@ -22,9 +22,11 @@ import android.widget.Toast;
 import com.example.leakyroof.GameActivity;
 import com.example.leakyroof.MainActivity;
 import com.example.leakyroof.R;
+import com.example.leakyroof.data.LevelActivity;
 import com.example.leakyroof.data.LoginDataSource;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class LoginActivity extends MainActivity {
 
@@ -160,7 +162,7 @@ public class LoginActivity extends MainActivity {
     private void updateUiWithUser(LoggedInUserView model) {
         // only if successful login/registration
         String welcome = getString(R.string.welcome) + model.getDisplayName();
-        Intent intent = new Intent(this, GameActivity.class);
+        Intent intent = new Intent(this, LevelActivity.class);
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         startActivity(intent);
     }
