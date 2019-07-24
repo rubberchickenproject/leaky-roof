@@ -12,6 +12,8 @@ import android.widget.Button;
 import com.example.leakyroof.GameActivity;
 import com.example.leakyroof.R;
 
+import java.util.List;
+
 public class LevelActivity extends AppCompatActivity {
 
     @Override
@@ -36,8 +38,10 @@ public class LevelActivity extends AppCompatActivity {
 
     public void onClick(View view) {
         // TODO: direct to different activities according to level
-        String text = ((Button) view).getText().toString();
-        Intent intent = new Intent(this, GameActivity.class);
+        String[] text = ((Button) view).getText().toString().split(" ");
+        int level = Integer.valueOf(text[text.length - 1]);
+        Intent intent = new Intent(this, GameActivity.class)
+                .putExtra("level", level);
         startActivity(intent);
     }
 }

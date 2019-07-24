@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class GameActivity extends MainActivity {
 
-    private int LEVEL = 5; // TODO: make this adjustable
+    private int LEVEL;
     private static final int MAX_RAINDROP_DIAMETER = 100;
     private static final float RAINDROP_AVG_SPEED = 2.0f; // 1.0f for testing, 2.0f for users
     private static final int MAX_DELAY = 1000;
@@ -36,6 +36,8 @@ public class GameActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         LOGIN_FILE_NAME = getFilesDir() + "/roster";
+
+        LEVEL = getIntent().getIntExtra("level", 1);
 
         // get window dimensions
         DisplayMetrics appMetrics = new DisplayMetrics();
